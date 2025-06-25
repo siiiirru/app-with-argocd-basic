@@ -1,0 +1,29 @@
+
+name: App With Github Actions with ArgoCD Basic
+on:
+  # workflow_dispatch
+  push
+
+jobs:
+  arcocd:
+    runs-on: ubuntu-latest
+
+    #코드를 직접 수정하기 때문에 깃허브 토큰 필요
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: main
+        token: ${{ secrets.GH_TOKEN }}
+
+    # nginx 버전을 latest로 수정
+    - name: Set up Image
+      run: |
+        sed -i "s%image: nginx:1.25%image: nginx:latest%" ./argocd-deployment.yaml
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email ""
+        git config --local user.name ""
+        git add .
+        git commit -m "Update nginx image to latest"
+        git push
